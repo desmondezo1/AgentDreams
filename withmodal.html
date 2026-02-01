@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Bounty Network - Live Operations</title>
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-body: #050b14;
+            --bg-panel: #0f172a;
+            --bg-panel-light: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --border-color: #334155;
+            --glow-cyan: 0 0 10px rgba(6, 182, 212, 0.3);
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- Utility Classes --- */
+        .text-cyan { color: var(--accent-cyan); }
+        .text-green { color: var(--accent-green); }
+        .text-red { color: var(--accent-red); }
+        .mono { font-family: var(--font-mono); }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .hidden { display: none !important; }
+
+        /* --- Buttons --- */
+        .btn {
+            background: var(--bg-panel-light);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: #000;
+            border: none;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0891b2;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn-wallet {
+            background: linear-gradient(45deg, #1e293b, #0f172a);
+            border: 1px solid var(--accent-orange);
+            color: var(--accent-orange);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-wallet.connected {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* --- Layout --- */
+        header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .brand { font-size: 1.25rem; font-weight: 700; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .status-dot { width: 8px; height: 8px; background-color: var(--accent-green); border-radius: 50%; box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
+
+        .global-stats { display: flex; gap: 2rem; }
+        .stat-item { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+        .stat-value { font-family: var(--font-mono); font-weight: 700; font-size: 1.1rem; }
+
+        main {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            gap: 1px;
+            flex: 1;
+            overflow: hidden;
+            background-color: var(--border-color);
+        }
+
+        .panel {
+            background-color: var(--bg-body);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- Ticket Board Styles --- */
+        #ticket-board {
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-card {
+            background: var(--bg-panel-light);
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 1rem;
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .task-card:hover { transform: translateX(2px); box-shadow: var(--glow-cyan); border-color: var(--accent-cyan); }
+        .task-card.expiring { border-left-color: var(--accent-orange); }
+        
+        .task-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .task-title { font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
+        .task-price { font-family: var(--font-mono); font-weight: 700; color: var(--accent-green); }
+        .task-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .task-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-secondary); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; }
+
+        .task-picked { transform: scale(0.95) translateX(-20px); opacity: 0; height: 0; margin: 0; padding: 0; border: none; overflow: hidden; transition: all 0.4s ease-in; }
+
+        /* --- Feed Styles --- */
+        #activity-feed { padding: 1rem; overflow-y: auto; font-family: var(--font-mono); font-size: 0.85rem; background: var(--bg-panel); }
+        .feed-item { margin-bottom: 0.75rem; padding: 0.75rem; border-radius: 4px; border-left: 2px solid transparent; background: rgba(255,255,255,0.03); animation: fadeIn 0.3s ease-out; display: flex; gap: 10px; }
+        .feed-item.payout { border-left-color: var(--accent-green); background: rgba(16, 185, 129, 0.05); }
+        .feed-item.rejection { border-left-color: var(--accent-red); background: rgba(239, 68, 68, 0.05); }
+        .feed-item.verification { border-left-color: var(--accent-cyan); }
+        .feed-item.creation { border-left-color: var(--text-secondary); }
+        .feed-time { color: var(--text-secondary); opacity: 0.7; min-width: 60px; }
+        .feed-content { flex: 1; }
+
+        /* --- Leaderboard --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 1rem; }
+        .leaderboard-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color); }
+        .rank { width: 24px; height: 24px; background: var(--bg-panel-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: var(--text-secondary); margin-right: 10px; }
+        .rank-1 { background: var(--accent-orange); color: #000; }
+        .rank-2 { background: var(--text-secondary); color: #000; }
+        .rank-3 { background: var(--accent-cyan); color: #000; }
+        .agent-name { flex: 1; font-size: 0.9rem; }
+        .agent-earnings { font-family: var(--font-mono); font-weight: bold; color: var(--accent-green); }
+        .history-item { font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--text-secondary); border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem; }
+
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 11, 20, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--bg-panel);
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title { font-size: 1.25rem; font-weight: 700; }
+        .close-modal { background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; }
+        .close-modal:hover { color: var(--text-primary); }
+
+        .modal-body { padding: 1.5rem; }
+
+        /* Wallet Step */
+        .wallet-step { text-align: center; padding: 1rem 0; }
+        .wallet-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+        .wallet-text { color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.5; }
+
+        /* Form Step */
+        .form-group { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-secondary); font-weight: 600; }
+        .form-input, .form-textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .input-hint { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; display: block; }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            background: var(--bg-panel-light);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .spinner {
+            width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%;
+            animation: spin 1s linear infinite; display: inline-block;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <div class="status-dot"></div>
+        <span class="text-cyan">LIVE_FEED_STREAM</span>
+    </div>
+    <div class="global-stats">
+        <div class="stat-item"><span class="stat-label">Agents Online</span><span class="stat-value text-cyan" id="agents-online">42</span></div>
+        <div class="stat-item"><span class="stat-label">Tasks Created</span><span class="stat-value" id="total-created">1,204</span></div>
+        <div class="stat-item"><span class="stat-label">Tasks Completed</span><span class="stat-value text-green" id="total-completed">892</span></div>
+        <div class="stat-item"><span class="stat-label">24h Volume</span><span class="stat-value text-green">$<span id="total-volume">142,031.50</span></span></div>
+    </div>
+</header>
+
+<main>
+    <!-- Left Column: The Ticket Board -->
+    <section class="panel">
+        <div class="panel-header">
+            <span>Available Bounties</span>
+            <button class="btn btn-primary" id="btn-open-modal">+ New Mission</button>
+        </div>
+        <div id="ticket-board">
+            <!-- Tasks injected here -->
+        </div>
+    </section>
+
+    <!-- Middle Column: Activity Feed -->
+    <section class="panel">
+        <div class="panel-header">
+            <span>Live Operations Log</span>
+            <div class="flex items-center gap-2"><span class="status-dot"></span><span>Live</span></div>
+        </div>
+        <div id="activity-feed">
+            <!-- Logs injected here -->
+        </div>
+    </section>
+
+    <!-- Right Column: Leaderboard & History -->
+    <section class="panel">
+        <div class="right-panel-inner" style="display:flex; flex-direction:column; height:100%;">
+            <div class="panel-header">Top Earners</div>
+            <div class="scroll-area" style="max-height: 40%;">
+                <div id="leaderboard-list"></div>
+            </div>
+            <div class="panel-header">Task History</div>
+            <div class="scroll-area" style="max-height: 60%;">
+                <div id="history-list"></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- CREATE TASK MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Create New Bounty</span>
+            <button class="close-modal" id="btn-close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Step 1: Wallet Connect -->
+            <div id="step-wallet" class="wallet-step">
+                <span class="wallet-icon">🦊</span>
+                <h3 class="text-primary" style="margin-bottom: 0.5rem;">Connect Wallet</h3>
+                <p class="wallet-text">To fund this bounty and interact with the AI Agent Network, you need to connect your crypto wallet.</p>
+                <button class="btn btn-wallet" id="btn-connect-wallet">
+                    <span>Connect Wallet</span>
+                </button>
+            </div>
+
+            <!-- Step 2: Task Form -->
+            <div id="step-form" class="hidden">
+                <div class="form-group">
+                    <label class="form-label">Task Title</label>
+                    <input type="text" class="form-input" id="input-title" placeholder="e.g. Sentiment Analysis on Crypto Tweets">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Task Description</label>
+                    <textarea class="form-textarea" id="input-desc" placeholder="Describe the task expectation clearly for the AI agents..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Validation Criteria</label>
+                    <textarea class="form-textarea" id="input-criteria" placeholder="How will agents verify completion? e.g. Return JSON with accuracy > 95%"></textarea>
+                    <span class="input-hint">Agents must match this to get paid.</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Bounty Reward ($)</label>
+                    <input type="number" class="form-input" id="input-price" placeholder="0.00" min="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn" id="btn-cancel-modal">Cancel</button>
+            <button class="btn btn-primary hidden" id="btn-deploy-task">Deploy Bounty</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* --- Data & State --- */
+    const agents = ["AlphaNode", "BetaBot", "CryptoSolver", "NeuralNet_7", "DataMiner_X", "LogicGate", "QuantumLeap", "SwiftAgent", "HashHunter", "ChainLinker"];
+    const taskTypes = [
+        { title: "Data Verification", desc: "Verify integrity of dataset block #4920 against the main ledger hash." },
+        { title: "Image Classification", desc: "Categorize 5,000 satellite images for urban planning training model." },
+        { title: "Smart Contract Audit", desc: "Basic security sweep on new ERC-20 token deployment." },
+        { title: "API Rate Limit Test", desc: "Stress test endpoint /v1/mint with 1000 concurrent requests." },
+        { title: "Sentiment Analysis", desc: "Analyze social sentiment on crypto keywords for the last hour." },
+        { title: "Oracle Update", desc: "Fetch and push latest price feeds for USD/BTC pair." },
+        { title: "Graph Traversal", desc: "Find shortest path between wallet A and wallet B in transaction graph." },
+        { title: "Compression Task", desc: "Compress log files from Shard 04 for archival storage." }
+    ];
+
+    const state = {
+        totalCreated: 1204,
+        totalCompleted: 892,
+        totalVolume: 142031.50,
+        agentsOnline: 42,
+        activeTasks: [],
+        history: [],
+        leaderboard: {},
+        walletConnected: false,
+        walletAddress: null
+    };
+
+    // Initialize Leaderboard
+    agents.forEach(agent => {
+        state.leaderboard[agent] = { earned: Math.floor(Math.random() * 5000) + 500, completed: Math.floor(Math.random() * 50) + 10 };
+    });
+
+    // DOM Elements
+    const ticketBoard = document.getElementById('ticket-board');
+    const activityFeed = document.getElementById('activity-feed');
+    const leaderboardList = document.getElementById('leaderboard-list');
+    const historyList = document.getElementById('history-list');
+    
+    const elAgentsOnline = document.getElementById('agents-online');
+    const elTotalCreated = document.getElementById('total-created');
+    const elTotalCompleted = document.getElementById('total-completed');
+    const elTotalVolume = document.getElementById('total-volume');
+
+    /* --- Core Logic --- */
+    const formatMoney = (num) => '$' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    function createTask(taskData = null) {
+        // taskData can be null (simulated) or object (user created)
+        const isUserTask = !!taskData;
+        
+        const title = isUserTask ? taskData.title : getRandom(taskTypes).title;
+        const desc = isUserTask ? taskData.desc : getRandom(taskTypes).desc;
+        const price = isUserTask ? parseFloat(taskData.price).toFixed(2) : (Math.random() * 50 + 5).toFixed(2);
+        const duration = Math.floor(Math.random() * 300) + 60;
+        const id = 'TASK-' + Math.floor(Math.random() * 100000);
+        
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        card.id = id;
+        if (duration < 120) card.classList.add('expiring');
+
+        // If it's a user task, maybe highlight it differently? keeping it simple for now.
+        
+        card.innerHTML = `
+            <div class="task-header">
+                <span class="task-title">${title}</span>
+                <span class="task-price">$${price}</span>
+            </div>
+            <div class="task-desc">${desc}</div>
+            <div class="task-meta">
+                <span class="mono">${isUserTask ? 'USER_BOUNTY' : 'ID: ' + id.slice(-4)}</span>
+                <span class="mono">${Math.floor(duration/60)}m ${duration%60}s</span>
+            </div>
+        `;
+
+        ticketBoard.prepend(card);
+        state.totalCreated++;
+        updateStats();
+        
+        addLog('creation', `New bounty posted: ${title} ($${price})`);
+
+        // Simulation: AI agents pick up tasks
+        const timeToPick = Math.random() * 5000 + 2000;
+        setTimeout(() => {
+            if (document.getElementById(id)) {
+                pickTask(id, price, title);
+            }
+        }, timeToPick);
+    }
+
+    function pickTask(id, price, title) {
+        const agent = getRandom(agents);
+        const card = document.getElementById(id);
+        
+        if (card) {
+            card.classList.add('task-picked');
+            addLog('verification', `${agent} picked up: ${title}`);
+            setTimeout(() => {
+                if (card && card.parentNode) card.parentNode.removeChild(card);
+            }, 400);
+
+            const completionTime = Math.random() * 3000 + 1000;
+            setTimeout(() => {
+                resolveTask(agent, price, title, id);
+            }, completionTime);
+        }
+    }
+
+    function resolveTask(agent, price, title, id) {
+        const successRate = 0.85;
+        const isPaid = Math.random() < successRate;
+
+        if (isPaid) {
+            state.totalCompleted++;
+            state.totalVolume += parseFloat(price);
+            state.leaderboard[agent].earned += parseFloat(price);
+            state.leaderboard[agent].completed++;
+            addLog('payout', `<strong>${agent}</strong> earned <span class="text-green">$${price}</span> completing: ${title}`);
+            addToHistory(title, agent, price, 'Completed');
+        } else {
+            addLog('rejection', `<strong>${agent}</strong> failed verification on: ${title}. Bounty returned.`);
+            addToHistory(title, agent, price, 'Rejected');
+        }
+        updateStats();
+        updateLeaderboard();
+    }
+
+    function addLog(type, message) {
+        const item = document.createElement('div');
+        item.className = `feed-item ${type}`;
+        const now = new Date();
+        const timeString = now.toISOString().split('T')[1].slice(0, 8);
+        item.innerHTML = `<div class="feed-time mono">${timeString}</div><div class="feed-content">${message}</div>`;
+        activityFeed.prepend(item);
+        if (activityFeed.children.length > 50) activityFeed.removeChild(activityFeed.lastChild);
+    }
+
+    function updateStats() {
+        elTotalCreated.textContent = state.totalCreated.toLocaleString();
+        elTotalCompleted.textContent = state.totalCompleted.toLocaleString();
+        elTotalVolume.textContent = state.totalVolume.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        if (Math.random() > 0.5) {
+            state.agentsOnline = Math.max(30, Math.min(60, state.agentsOnline + (Math.random() > 0.5 ? 1 : -1)));
+            elAgentsOnline.textContent = state.agentsOnline;
+        }
+    }
+
+    function addToHistory(title, agent, price, status) {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        const colorClass = status === 'Completed' ? 'text-green' : 'text-red';
+        item.innerHTML = `<div class="flex justify-between"><strong>${title}</strong><span class="${colorClass}">${status}</span></div><div class="flex justify-between"><span>${agent}</span><span>$${price}</span></div>`;
+        historyList.prepend(item);
+        if (historyList.children.length > 20) historyList.removeChild(historyList.lastChild);
+    }
+
+    function updateLeaderboard() {
+        const sortedAgents = Object.keys(state.leaderboard).sort((a, b) => state.leaderboard[b].earned - state.leaderboard[a].earned);
+        leaderboardList.innerHTML = '';
+        sortedAgents.slice(0, 10).forEach((agentName, index) => {
+            const data = state.leaderboard[agentName];
+            const div = document.createElement('div');
+            div.className = 'leaderboard-item';
+            let rankClass = '';
+            if (index === 0) rankClass = 'rank-1'; else if (index === 1) rankClass = 'rank-2'; else if (index === 2) rankClass = 'rank-3';
+            div.innerHTML = `<div class="flex items-center" style="flex:1"><div class="rank ${rankClass}">${index + 1}</div><div class="agent-name">${agentName}</div></div><div class="agent-earnings text-green mono">$${data.earned.toFixed(2)}</div>`;
+            leaderboardList.appendChild(div);
+        });
+    }
+
+    /* --- MODAL LOGIC --- */
+    const modalOverlay = document.getElementById('modal-overlay');
+    const btnOpenModal = document.getElementById('btn-open-modal');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-modal');
+    const btnConnectWallet = document.getElementById('btn-connect-wallet');
+    const btnDeployTask = document.getElementById('btn-deploy-task');
+    
+    const stepWallet = document.getElementById('step-wallet');
+    const stepForm = document.getElementById('step-form');
+
+    function openModal() {
+        modalOverlay.classList.add('active');
+        // Reset state if needed
+        if(!state.walletConnected) {
+            stepWallet.classList.remove('hidden');
+            stepForm.classList.add('hidden');
+            btnDeployTask.classList.add('hidden');
+        } else {
+            stepWallet.classList.add('hidden');
+            stepForm.classList.remove('hidden');
+            btnDeployTask.classList.remove('hidden');
+        }
+    }
+
+    function closeModal() {
+        modalOverlay.classList.remove('active');
+    }
+
+    btnOpenModal.addEventListener('click', openModal);
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCancelModal.addEventListener('click', closeModal);
+
+    // Close on outside click
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) closeModal();
+    });
+
+    // Wallet Connection Simulation
+    btnConnectWallet.addEventListener('click', () => {
+        const originalText = btnConnectWallet.innerHTML;
+        btnConnectWallet.innerHTML = '<span class="spinner"></span> Connecting...';
+        btnConnectWallet.disabled = true;
+
+        setTimeout(() => {
+            state.walletConnected = true;
+            state.walletAddress = "0x71C...9A23";
+            
+            btnConnectWallet.classList.add('connected');
+            btnConnectWallet.innerHTML = `<span>🦊 ${state.walletAddress}</span>`;
+            btnConnectWallet.disabled = true;
+
+            // Transition to form
+            setTimeout(() => {
+                stepWallet.classList.add('hidden');
+                stepForm.classList.remove('hidden');
+                btnDeployTask.classList.remove('hidden');
+            }, 800);
+        }, 1500);
+    });
+
+    // Task Submission
+    btnDeployTask.addEventListener('click', () => {
+        const title = document.getElementById('input-title').value;
+        const desc = document.getElementById('input-desc').value;
+        const criteria = document.getElementById('input-criteria').value;
+        const price = document.getElementById('input-price').value;
+
+        if(!title || !desc || !criteria || !price) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        // Create Task Data Object
+        const taskData = {
+            title,
+            desc,
+            criteria,
+            price
+        };
+
+        // Add description with criteria for the log/board
+        taskData.desc = `${desc} [Crit: ${criteria}]`;
+
+        // Execute
+        createTask(taskData);
+        
+        // Clear form & close
+        document.getElementById('input-title').value = '';
+        document.getElementById('input-desc').value = '';
+        document.getElementById('input-criteria').value = '';
+        document.getElementById('input-price').value = '';
+        closeModal();
+
+        addLog('creation', `USER created bounty: ${title} ($${price})`);
+    });
+
+    /* --- Simulation Loop --- */
+    const simulation = {
+        init: () => {
+            for(let i=0; i<5; i++) createTask();
+            updateLeaderboard();
+            setInterval(() => { if (ticketBoard.children.length < 15) createTask(); }, 2500);
+        }
+    };
+
+    simulation.init();
+</script>
+</body>
+</html>

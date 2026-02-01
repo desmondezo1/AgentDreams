@@ -16,7 +16,7 @@ export const getEscrowInstructions = (
     'function createTask(bytes32 taskId, uint256 payout, uint64 deadline)'
   ]);
 
-  const payoutWei = ethers.parseUnits(payout, 6); // USDC has 6 decimals
+  const payoutWei = ethers.parseUnits(payout, 18); // MockUSDC has 18 decimals (real USDC = 6)
   const callData = iface.encodeFunctionData('createTask', [
     taskIdBytes32,
     payoutWei,

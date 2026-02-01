@@ -6,6 +6,7 @@ import crypto from 'crypto';
 export const createTask = async (req: Request, res: Response) => {
   try {
     const {
+      id, // Optional - if provided from frontend (blockchain flow)
       title,
       spec,
       payload,
@@ -14,19 +15,14 @@ export const createTask = async (req: Request, res: Response) => {
       verification_mode,
       verifier_type,
       validators,
-      requester_wallet
+      requester_wallet,
+      escrow_tx_hash // Optional - transaction hash from blockchain funding
     } = req.body;
 
     // TODO: Add strict validation (zod or manual)
 
-    // 1. Generate IDs
-    // We let Postgres generate the UUID, so we insert and return it first? 
-    // Or generate in JS. Generating in JS is easier for bytes32 derivation before insert.
-    // Actually, let's use a postgres function or just fetch `uuid_generate_v4()` first?
-    // Or just use `crypto.randomUUID()` in Node.
-    
-    // Using node crypto for UUID to ensure we have it for bytes32 derivation
-    const taskId = crypto.randomUUID();
+    // 1. Generate or use provided ID
+    const taskId = id || crypto.randomUUID();
     const taskIdBytes32 = toBytes32(taskId);
 
     const deadlineTimestamp = Math.floor(new Date(deadline_at).getTime() / 1000);
@@ -34,15 +30,15 @@ export const createTask = async (req: Request, res: Response) => {
     // 2. Insert into DB
     const text = `
       INSERT INTO tasks (
-        id, task_id_bytes32, title, spec, payload_ref, 
-        payout_usdc, deadline_at, verification_mode, 
-        verifier_type, validator_n, validator_threshold, 
-        validator_fee_total_usdc, status, requester_wallet
+        id, task_id_bytes32, title, spec, payload_ref,
+        payout_usdc, deadline_at, verification_mode,
+        verifier_type, validator_n, validator_threshold,
+        validator_fee_total_usdc, status, requester_wallet, escrow_tx_hash
       ) VALUES (
-        $1, $2, $3, $4, $5, 
-        $6, $7, $8, 
-        $9, $10, $11, 
-        $12, 'DRAFT', $13
+        $1, $2, $3, $4, $5,
+        $6, $7, $8,
+        $9, $10, $11,
+        $12, 'OPEN', $13, $14
       ) RETURNING *
     `;
 
@@ -59,16 +55,34 @@ export const createTask = async (req: Request, res: Response) => {
       validators?.n || null,
       validators?.threshold || null,
       validators?.fee_total_usdc || null,
-      requester_wallet // "0x..."
+      requester_wallet, // "0x..."
+      escrow_tx_hash || null
     ];
 
     const { rows } = await query(text, values);
     const task = rows[0];
 
-    // 3. Generate Escrow Instructions
+    // 3. Emit task.created event to event_stream
+    await query(
+      `INSERT INTO event_stream (type, task_id, actor_agent_id, data_json)
+       VALUES ($1, $2, $3, $4)`,
+      [
+        'task.created',
+        task.id,
+        null, // No agent involved yet
+        JSON.stringify({
+          title: task.title,
+          payout: task.payout_usdc,
+          payout_usdc: task.payout_usdc,
+          requester: task.requester_wallet
+        })
+      ]
+    );
+
+    // 4. Generate Escrow Instructions
     const instructions = getEscrowInstructions(
       taskIdBytes32,
-      payout_usdc,
+      payout_usdc.toString(), // Convert to string for parseUnits
       deadlineTimestamp,
       process.env.ESCROW_CONTRACT_ADDRESS!,
       process.env.USDC_ADDRESS!
