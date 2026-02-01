@@ -155,7 +155,7 @@ export default function SetupPage() {
           fontSize: '2rem',
           fontWeight: 700,
           marginBottom: '1rem',
-          background: 'linear-gradient(90deg, var(--accent-cyan) 0%, var(--accent-purple) 100%)',
+          background: 'linear-gradient(90deg, #f97316 0%, #fbbf24 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
@@ -179,7 +179,7 @@ export default function SetupPage() {
             onClick={addLocalhostNetwork}
             disabled={loading}
             style={{
-              background: 'var(--accent-purple)',
+              background: '#f97316',
               color: '#fff',
               border: 'none',
               padding: '0.75rem 1.5rem',
@@ -349,7 +349,7 @@ export default function SetupPage() {
           <a
             href="/feed"
             style={{
-              color: 'var(--accent-cyan)',
+              color: '#f97316',
               textDecoration: 'none',
               fontSize: '1rem',
               fontWeight: 600
