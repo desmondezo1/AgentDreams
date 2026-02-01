@@ -1,5 +1,7 @@
 import { ethers } from 'ethers';
-import contractsData from '../contracts/contracts.json';
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const contractsData = require('@/contracts/contracts.json');
 
 // Contract addresses and ABIs
 export const CONTRACTS = {
