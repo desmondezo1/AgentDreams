@@ -3,20 +3,27 @@
 @import "tailwindcss";
 
 :root {
-  /* Color Palette based on "Dark Tech/Cyberpunk" aesthetic */
-  --bg-body: #050b14;
-  --bg-panel: #0f172a;
-  --bg-panel-light: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --accent-cyan: #06b6d4;
+  /* zzzclaw Color Palette - Matches OpenClaw aesthetic */
+  --bg-body: #050810;
+  --bg-panel: #0a0f1a;
+  --bg-panel-light: #111827;
+  --text-primary: #f0f4ff;
+  --text-secondary: #8892b0;
+  --text-muted: #5a6480;
+  --accent-coral: #ff4d4d;
+  --accent-coral-mid: #e63946;
+  --accent-coral-dark: #991b1b;
+  --accent-cyan: #00e5cc;
+  --accent-cyan-mid: #14b8a6;
   --accent-green: #10b981;
-  --accent-red: #ef4444;
+  --accent-red: #ff4d4d;
   --accent-orange: #f59e0b;
-  --border-color: #334155;
-  --glow-cyan: 0 0 10px rgba(6, 182, 212, 0.3);
-  --font-mono: 'Courier New', Courier, monospace;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --border-color: rgba(136, 146, 176, .15);
+  --border-accent: rgba(255, 77, 77, .3);
+  --glow-coral: 0 0 10px rgba(255, 77, 77, 0.3);
+  --glow-cyan: 0 0 10px rgba(0, 229, 204, 0.3);
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', Courier, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -80,16 +87,16 @@ body {
 }
 
 /* Text Glow Effects */
+.text-glow-coral {
+  text-shadow: 0 0 20px rgba(255, 77, 77, 0.5), 0 0 40px rgba(255, 77, 77, 0.3);
+}
+
 .text-glow-cyan {
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.5), 0 0 40px rgba(0, 240, 255, 0.3);
+  text-shadow: 0 0 20px rgba(0, 229, 204, 0.5), 0 0 40px rgba(0, 229, 204, 0.3);
 }
 
 .text-glow-green {
-  text-shadow: 0 0 20px rgba(0, 255, 148, 0.5), 0 0 40px rgba(0, 255, 148, 0.3);
-}
-
-.text-glow-red {
-  text-shadow: 0 0 20px rgba(255, 42, 109, 0.5), 0 0 40px rgba(255, 42, 109, 0.3);
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.5), 0 0 40px rgba(16, 185, 129, 0.3);
 }
 
 /* Glass Morphism */
@@ -121,7 +128,7 @@ body {
   position: absolute;
   width: 12px;
   height: 12px;
-  border: 1px solid rgba(0, 240, 255, 0.3);
+  border: 1px solid rgba(255, 77, 77, 0.3);
 }
 
 .corner-brackets::before {
@@ -202,13 +209,13 @@ body {
 
 /* Selection Color */
 ::selection {
-  background: rgba(0, 240, 255, 0.3);
+  background: rgba(255, 77, 77, 0.3);
   color: #fff;
 }
 
 /* Global Focus Styles */
 :focus-visible {
-  outline: 2px solid rgba(0, 240, 255, 0.5);
+  outline: 2px solid rgba(255, 77, 77, 0.5);
   outline-offset: 2px;
 }
 
@@ -218,9 +225,10 @@ html {
 }
 
 /* Utility Classes */
+.text-coral { color: var(--accent-coral); }
 .text-cyan { color: var(--accent-cyan); }
 .text-green { color: var(--accent-green); }
-.text-red { color: var(--accent-red); }
+.text-red { color: var(--accent-coral); }
 .mono { font-family: var(--font-mono); }
 
 /* Panel Styles */
@@ -249,7 +257,7 @@ html {
 .task-card {
   background: var(--bg-panel-light);
   border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-cyan);
+  border-left: 3px solid var(--accent-coral);
   padding: 1rem;
   border-radius: 4px;
   position: relative;
@@ -259,8 +267,8 @@ html {
 
 .task-card:hover {
   transform: translateX(2px);
-  box-shadow: var(--glow-cyan);
-  border-color: var(--accent-cyan);
+  box-shadow: var(--glow-coral);
+  border-color: var(--accent-coral);
 }
 
 .task-card.expiring {
@@ -320,7 +328,7 @@ html {
 }
 
 .feed-item.verification {
-  border-left-color: var(--accent-cyan);
+  border-left-color: var(--accent-coral);
 }
 
 .feed-item.creation {

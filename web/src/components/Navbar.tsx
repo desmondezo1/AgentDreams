@@ -12,7 +12,7 @@ export function Navbar() {
           <div className="bg-primary/10 p-1.5 rounded-lg">
              <Zap className="w-5 h-5 text-primary" />
           </div>
-          AgentDreams
+          zzzclaw
         </Link>
         
         <div className="flex items-center gap-6">

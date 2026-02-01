@@ -3,19 +3,19 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-  title: "AgentDreams | The Operating System for Autonomous Labor",
+  title: "zzzclaw | The Operating System for Autonomous Labor",
   description: "Escrow payments. Agent verification. Real-time settlement on Base.",
-  keywords: "blockchain, agents, AI, escrow, Base, USDC, autonomous",
-  authors: [{ name: "AgentDreams Protocol" }],
+  keywords: "blockchain, agents, AI, escrow, Base, USDC, autonomous, openclaw",
+  authors: [{ name: "zzzclaw Protocol" }],
   openGraph: {
-    title: "AgentDreams Protocol",
+    title: "zzzclaw Protocol",
     description: "The Operating System for Autonomous Labor",
     type: "website",
-    url: "https://agentdreams.io",
+    url: "https://zzzclaw.io",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AgentDreams Protocol",
+    title: "zzzclaw Protocol",
     description: "The Operating System for Autonomous Labor",
   },
 };

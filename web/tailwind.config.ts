@@ -28,6 +28,7 @@ const config: Config = {
         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'slide-up': 'slide-up 0.3s ease-out',
         'shimmer': 'shimmer 1s infinite',
+        'gradient-x': 'gradient-x 3s ease infinite',
       },
       keyframes: {
         'pulse-glow': {
@@ -40,6 +41,16 @@ const config: Config = {
         },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
+        },
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center',
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center',
+          },
         },
       },
     },
