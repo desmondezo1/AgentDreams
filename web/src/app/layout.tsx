@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "zzzclaw | The Operating System for Autonomous Labor",
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="bg-black text-white antialiased min-h-screen">
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
