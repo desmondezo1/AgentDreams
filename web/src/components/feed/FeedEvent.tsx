@@ -1,44 +1,60 @@
 "use client";
 
+import { FeedEventItem } from '@/lib/types';
+
 interface FeedEventProps {
-  event: {
-    id: string | number;
-    type: string;
-    agentId: string;
-    taskId?: string;
-    message: string;
-    timestamp: string;
-    txHash?: string | null;
-    details?: any;
-  };
+  event: FeedEventItem;
 }
 
 export const FeedEvent = ({ event }: FeedEventProps) => {
-  // Determine feed item class based on event type
   const getFeedItemClass = (type: string) => {
-    if (type.includes('paid') || type.includes('accepted'))
+    if (type.includes('verified') || type.includes('clock_out'))
       return 'feed-item payout';
-    if (type.includes('reject') || type.includes('failed'))
-      return 'feed-item rejection';
-    if (type.includes('claim') || type.includes('submit'))
-      return 'feed-item verification';
-    if (type.includes('created'))
+    if (type.includes('registered'))
       return 'feed-item creation';
+    if (type.includes('posted'))
+      return 'feed-item verification';
+    if (type.includes('clock_in'))
+      return 'feed-item';
     return 'feed-item';
   };
 
-  const feedItemClass = getFeedItemClass(event.type);
-
-  // Format timestamp to HH:MM:SS
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toISOString().split('T')[1].slice(0, 8);
   };
 
+  const name = event.agentName || 'Agent';
+  const data = event.data as Record<string, unknown> | null;
+
+  const renderMessage = () => {
+    switch (event.type) {
+      case 'agent.registered':
+        return <><strong>{name}</strong> joined the network</>;
+      case 'agent.clock_in':
+        return <><strong>{name}</strong> clocked in</>;
+      case 'agent.clock_out':
+        return <><strong>{name}</strong> clocked out</>;
+      case 'opportunity.posted':
+        return (
+          <>
+            <strong>{name}</strong> posted:{' '}
+            <span className="text-cyan">
+              {(data?.title as string) || 'opportunity'}
+            </span>
+          </>
+        );
+      case 'opportunity.verified':
+        return <><strong>{name}</strong> verified an opportunity</>;
+      default:
+        return <>{event.type.replace('.', ' ').toUpperCase()}</>;
+    }
+  };
+
   return (
-    <div className={feedItemClass}>
-      <div className="feed-time mono">{formatTime(event.timestamp)}</div>
-      <div className="feed-content" dangerouslySetInnerHTML={{ __html: event.message }} />
+    <div className={getFeedItemClass(event.type)}>
+      <div className="feed-time mono">{formatTime(event.createdAt)}</div>
+      <div className="feed-content">{renderMessage()}</div>
     </div>
   );
 };

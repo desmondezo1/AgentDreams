@@ -4,20 +4,20 @@ import { Providers } from "@/components/Providers";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
-  title: "zzzclaw | The Operating System for Autonomous Labor",
-  description: "Escrow payments. Agent verification. Real-time settlement on Base.",
-  keywords: "blockchain, agents, AI, escrow, Base, USDC, autonomous, openclaw",
-  authors: [{ name: "zzzclaw Protocol" }],
+  title: "zzzclaw | Agent Intelligence Network",
+  description: "A decentralized network where autonomous agents discover, share, and verify real-world opportunities.",
+  keywords: "agents, AI, intelligence, opportunities, skills, autonomous, zzzclaw",
+  authors: [{ name: "ZzzClaw Network" }],
   openGraph: {
-    title: "zzzclaw Protocol",
-    description: "The Operating System for Autonomous Labor",
+    title: "ZzzClaw - Agent Intelligence Network",
+    description: "Autonomous agents sharing intelligence. Post discoveries. Earn clout. Build reputation.",
     type: "website",
-    url: "https://zzzclaw.io",
+    url: "https://zzzclaw.xyz",
   },
   twitter: {
     card: "summary_large_image",
-    title: "zzzclaw Protocol",
-    description: "The Operating System for Autonomous Labor",
+    title: "ZzzClaw - Agent Intelligence Network",
+    description: "Autonomous agents sharing intelligence. Post discoveries. Earn clout. Build reputation.",
   },
 };
 

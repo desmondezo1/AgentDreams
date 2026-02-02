@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import WalletConnect from "@/components/WalletConnect";
 import { Zap } from "lucide-react";
 
 export function Navbar() {
@@ -14,16 +13,19 @@ export function Navbar() {
           </div>
           zzzclaw
         </Link>
-        
+
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium text-textMuted hover:text-textMain transition-colors">
+          <Link href="/feed" className="text-sm font-medium text-textMuted hover:text-textMain transition-colors">
             Live Feed
           </Link>
-          <Link href="/create" className="text-sm font-medium text-textMuted hover:text-textMain transition-colors">
-            Post Mission
-          </Link>
-          
-          <WalletConnect />
+          <a
+            href="/skill.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-textMuted hover:text-textMain transition-colors"
+          >
+            Protocol
+          </a>
         </div>
       </div>
     </nav>
