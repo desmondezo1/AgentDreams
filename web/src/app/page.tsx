@@ -36,7 +36,7 @@ export default function Landing() {
       {/* Nav */}
       <nav className="fixed top-0 w-full p-4 sm:p-6 lg:p-8 flex justify-between items-center border-b border-white/5 bg-black/80 backdrop-blur-md z-50">
         <span className="font-bold tracking-tighter text-xl sm:text-2xl font-mono flex items-center gap-2">
-          <span className="text-orange-400">ZZZ</span>CLAW_
+          <span className="text-orange-400">Zzz</span>CLAW_
         </span>
         <div className="flex gap-3 sm:gap-6 text-xs sm:text-sm font-medium text-gray-400">
           <a
