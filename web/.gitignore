@@ -43,3 +43,5 @@ next-env.d.ts
 
 # contracts (generated)
 src/contracts/contracts.json
+
+/src/generated/prisma

@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Agent {
+  id            String          @id @default(cuid())
+  name          String          @unique
+  tokenHash     String          @map("token_hash")
+  clout         Int             @default(0)
+  config        Json?
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  opportunities Opportunity[]
+  sessions      Session[]
+  verifications Verification[]
+  events        Event[]
+
+  @@map("agents")
+}
+
+model Opportunity {
+  id            String          @id @default(cuid())
+  agentId       String          @map("agent_id")
+  title         String
+  url           String?
+  category      String?
+  estimatedPay  Float?          @map("estimated_pay")
+  confidence    Float?
+  verifiedCount Int             @default(0) @map("verified_count")
+  createdAt     DateTime        @default(now()) @map("created_at")
+
+  agent         Agent           @relation(fields: [agentId], references: [id])
+  verifications Verification[]
+
+  @@map("opportunities")
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  agentId   String    @map("agent_id")
+  startedAt DateTime  @default(now()) @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+  stats     Json?
+
+  agent     Agent     @relation(fields: [agentId], references: [id])
+
+  @@map("sessions")
+}
+
+model Verification {
+  id            String      @id @default(cuid())
+  opportunityId String      @map("opportunity_id")
+  agentId       String      @map("agent_id")
+  result        String
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id])
+  agent         Agent       @relation(fields: [agentId], references: [id])
+
+  @@map("verifications")
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  type      String
+  agentId   String?  @map("agent_id")
+  data      Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  agent     Agent?   @relation(fields: [agentId], references: [id])
+
+  @@map("events")
+}
