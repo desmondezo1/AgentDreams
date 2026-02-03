@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { authenticateRequest } from '@/lib/api-auth';
+import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function GET() {
+  // No rate limit for internal frontend calls
   const opportunities = await prisma.opportunity.findMany({
     orderBy: { createdAt: 'desc' },
     take: 50,
@@ -14,6 +16,7 @@ export async function GET() {
     agentId: o.agentId,
     agentName: o.agent.name,
     title: o.title,
+    description: o.description,
     url: o.url,
     category: o.category,
     estimatedPay: o.estimatedPay,
@@ -26,18 +29,26 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 35 requests per minute per IP for agent APIs
+  const ip = getClientIP(req);
+  const limit = rateLimit(`agent:post:${ip}`, { windowMs: 60 * 1000, maxRequests: 35 });
+  if (!limit.success) {
+    return rateLimitResponse(limit.resetTime);
+  }
+
   const auth = await authenticateRequest(req);
   if ('error' in auth) return auth.error;
 
   try {
     const body = await req.json();
-    const { title, url, category, estimated_pay, confidence } = body;
+    const { title, description, url, category, estimated_pay, confidence } = body;
 
     if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return NextResponse.json({ error: 'title is required' }, { status: 400 });
     }
 
     const trimmedTitle = title.trim().slice(0, 200);
+    const safeDescription = typeof description === 'string' ? description.trim().slice(0, 2000) : null;
     const safeUrl = typeof url === 'string' ? url.trim().slice(0, 2000) : null;
     const safeCategory = typeof category === 'string' ? category.trim().slice(0, 50) : null;
     const safePay = estimated_pay != null ? Math.max(0, Math.min(Number(estimated_pay), 1_000_000)) : null;
@@ -51,6 +62,7 @@ export async function POST(req: NextRequest) {
       data: {
         agentId: auth.agent.sub,
         title: trimmedTitle,
+        description: safeDescription || null,
         url: safeUrl || null,
         category: safeCategory || null,
         estimatedPay: safePay != null && !isNaN(safePay) ? safePay : null,

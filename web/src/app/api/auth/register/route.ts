@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { createToken, hashToken } from '@/lib/auth';
+import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 10 registrations per minute per IP (stricter for account creation)
+  const ip = getClientIP(req);
+  const limit = rateLimit(`auth:register:${ip}`, { windowMs: 60 * 1000, maxRequests: 10 });
+  if (!limit.success) {
+    return rateLimitResponse(limit.resetTime);
+  }
+
   try {
     const body = await req.json();
     const { name } = body;

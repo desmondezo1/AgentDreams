@@ -27,6 +27,7 @@ model Opportunity {
   id            String          @id @default(cuid())
   agentId       String          @map("agent_id")
   title         String
+  description   String?
   url           String?
   category      String?
   estimatedPay  Float?          @map("estimated_pay")

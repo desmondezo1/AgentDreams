@@ -3,6 +3,7 @@ export interface Opportunity {
   agentId: string;
   agentName?: string;
   title: string;
+  description?: string | null;
   url?: string | null;
   category?: string | null;
   estimatedPay?: number | null;

@@ -9,7 +9,7 @@ interface RecentActivityProps {
 export const RecentActivity = ({ events }: RecentActivityProps) => {
   const timeAgo = (date: string) => {
     const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 60) return 'just now';
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
@@ -19,54 +19,50 @@ export const RecentActivity = ({ events }: RecentActivityProps) => {
 
   const typeLabel = (type: string) => {
     switch (type) {
-      case 'agent.registered': return 'JOINED';
-      case 'agent.clock_in': return 'ONLINE';
-      case 'agent.clock_out': return 'OFFLINE';
-      case 'opportunity.posted': return 'DISCOVERY';
-      case 'opportunity.verified': return 'VERIFIED';
-      default: return type.toUpperCase();
+      case 'agent.registered': return 'Joined';
+      case 'agent.clock_in': return 'Online';
+      case 'agent.clock_out': return 'Offline';
+      case 'opportunity.posted': return 'Discovery';
+      case 'opportunity.verified': return 'Verified';
+      default: return type.replace(/\./g, ' ');
     }
   };
 
-  const typeColor = (type: string) => {
-    if (type.includes('registered')) return 'var(--accent-cyan)';
-    if (type.includes('posted')) return 'var(--accent-green)';
-    if (type.includes('verified')) return 'var(--accent-orange)';
-    return 'var(--text-secondary)';
+  const getTypeStyle = (type: string) => {
+    if (type.includes('registered')) return 'text-orange-400 bg-orange-500/10';
+    if (type.includes('posted')) return 'text-green-400 bg-green-500/10';
+    if (type.includes('verified')) return 'text-amber-400 bg-amber-500/10';
+    if (type.includes('clock_in')) return 'text-gray-400 bg-white/5';
+    if (type.includes('clock_out')) return 'text-gray-500 bg-white/5';
+    return 'text-gray-400 bg-white/5';
   };
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 pb-4">
+    <div className="px-4 pb-4">
       {events.length > 0 ? (
         events.map((event) => (
           <div
             key={event.id}
-            className="text-xs mb-2 pb-2"
-            style={{
-              color: 'var(--text-secondary)',
-              borderBottom: '1px dashed var(--border-color)',
-            }}
+            className="py-3 border-b border-white/5 last:border-0"
           >
-            <div className="flex justify-between mb-1">
-              <strong style={{ color: 'var(--text-primary)' }}>
-                {event.agentName || 'Agent'}
-              </strong>
-              <span style={{ color: typeColor(event.type) }}>
-                {typeLabel(event.type)}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <span className="text-sm text-white font-medium truncate">
+                  {event.agentName || 'Agent'}
+                </span>
+                <span className={`px-2 py-0.5 rounded-full text-[0.65rem] font-medium ${getTypeStyle(event.type)}`}>
+                  {typeLabel(event.type)}
+                </span>
+              </div>
+              <span className="text-xs text-gray-500 whitespace-nowrap">
+                {timeAgo(event.createdAt)}
               </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="font-mono">{event.type}</span>
-              <span className="font-mono">{timeAgo(event.createdAt)}</span>
             </div>
           </div>
         ))
       ) : (
-        <div
-          className="text-center py-8 text-xs"
-          style={{ color: 'var(--text-secondary)' }}
-        >
-          -- NO ACTIVITY --
+        <div className="text-center py-8 text-sm text-gray-500">
+          No recent activity
         </div>
       )}
     </div>

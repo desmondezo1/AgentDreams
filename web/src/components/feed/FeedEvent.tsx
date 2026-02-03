@@ -7,21 +7,29 @@ interface FeedEventProps {
 }
 
 export const FeedEvent = ({ event }: FeedEventProps) => {
-  const getFeedItemClass = (type: string) => {
+  const getEventStyle = (type: string) => {
     if (type.includes('verified') || type.includes('clock_out'))
-      return 'feed-item payout';
+      return 'border-l-amber-400 bg-amber-500/5';
     if (type.includes('registered'))
-      return 'feed-item creation';
+      return 'border-l-orange-400 bg-orange-500/5';
     if (type.includes('posted'))
-      return 'feed-item verification';
+      return 'border-l-green-400 bg-green-500/5';
     if (type.includes('clock_in'))
-      return 'feed-item';
-    return 'feed-item';
+      return 'border-l-gray-500 bg-white/[0.02]';
+    return 'border-l-gray-600 bg-white/[0.02]';
   };
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    return date.toISOString().split('T')[1].slice(0, 8);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
   };
 
   const name = event.agentName || 'Agent';
@@ -30,31 +38,34 @@ export const FeedEvent = ({ event }: FeedEventProps) => {
   const renderMessage = () => {
     switch (event.type) {
       case 'agent.registered':
-        return <><strong>{name}</strong> joined the network</>;
+        return <><span className="font-medium text-white">{name}</span> <span className="text-gray-400">joined the network</span></>;
       case 'agent.clock_in':
-        return <><strong>{name}</strong> clocked in</>;
+        return <><span className="font-medium text-white">{name}</span> <span className="text-gray-400">is now online</span></>;
       case 'agent.clock_out':
-        return <><strong>{name}</strong> clocked out</>;
+        return <><span className="font-medium text-white">{name}</span> <span className="text-gray-400">went offline</span></>;
       case 'opportunity.posted':
         return (
           <>
-            <strong>{name}</strong> posted:{' '}
-            <span className="text-cyan">
-              {(data?.title as string) || 'opportunity'}
+            <span className="font-medium text-white">{name}</span>{' '}
+            <span className="text-gray-400">discovered</span>{' '}
+            <span className="text-orange-300">
+              {(data?.title as string) || 'an opportunity'}
             </span>
           </>
         );
       case 'opportunity.verified':
-        return <><strong>{name}</strong> verified an opportunity</>;
+        return <><span className="font-medium text-white">{name}</span> <span className="text-gray-400">verified an opportunity</span></>;
       default:
-        return <>{event.type.replace('.', ' ').toUpperCase()}</>;
+        return <span className="text-gray-400">{event.type.replace(/\./g, ' ')}</span>;
     }
   };
 
   return (
-    <div className={getFeedItemClass(event.type)}>
-      <div className="feed-time mono">{formatTime(event.createdAt)}</div>
-      <div className="feed-content">{renderMessage()}</div>
+    <div className={`mb-3 p-3 rounded-lg border-l-2 ${getEventStyle(event.type)} transition-all duration-200`}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="text-sm leading-relaxed flex-1">{renderMessage()}</div>
+        <span className="text-xs text-gray-500 whitespace-nowrap">{formatTime(event.createdAt)}</span>
+      </div>
     </div>
   );
 };

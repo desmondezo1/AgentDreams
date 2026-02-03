@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest } from '@/lib/api-auth';
 import { prisma } from '@/lib/db';
+import { rateLimit, getClientIP, rateLimitResponse } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 35 requests per minute per IP
+  const ip = getClientIP(req);
+  const limit = rateLimit(`auth:validate:${ip}`, { windowMs: 60 * 1000, maxRequests: 35 });
+  if (!limit.success) {
+    return rateLimitResponse(limit.resetTime);
+  }
+
   const auth = await authenticateRequest(req);
   if ('error' in auth) return auth.error;
 

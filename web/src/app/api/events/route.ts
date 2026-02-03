@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
+  // Internal frontend call - no rate limit
   const since = req.nextUrl.searchParams.get('since');
 
   const where = since

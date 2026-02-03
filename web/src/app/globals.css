@@ -3,25 +3,26 @@
 @import "tailwindcss";
 
 :root {
-  /* zzzclaw Color Palette - Matches OpenClaw aesthetic */
-  --bg-body: #050810;
-  --bg-panel: #0a0f1a;
-  --bg-panel-light: #111827;
-  --text-primary: #f0f4ff;
-  --text-secondary: #8892b0;
-  --text-muted: #5a6480;
-  --accent-coral: #ff4d4d;
-  --accent-coral-mid: #e63946;
-  --accent-coral-dark: #991b1b;
-  --accent-cyan: #00e5cc;
-  --accent-cyan-mid: #14b8a6;
+  /* ZzzClaw Color Palette - Orange/Amber theme */
+  --bg-body: #000000;
+  --bg-panel: #0a0a0a;
+  --bg-panel-light: #111111;
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent-coral: #fb923c;
+  --accent-coral-mid: #f97316;
+  --accent-coral-dark: #c2410c;
+  --accent-cyan: #fbbf24;
+  --accent-cyan-mid: #f59e0b;
   --accent-green: #10b981;
-  --accent-red: #ff4d4d;
-  --accent-orange: #f59e0b;
-  --border-color: rgba(136, 146, 176, .15);
-  --border-accent: rgba(255, 77, 77, .3);
-  --glow-coral: 0 0 10px rgba(255, 77, 77, 0.3);
-  --glow-cyan: 0 0 10px rgba(0, 229, 204, 0.3);
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
+  --accent-amber: #fbbf24;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(249, 115, 22, 0.3);
+  --glow-orange: 0 0 10px rgba(249, 115, 22, 0.3);
+  --glow-amber: 0 0 10px rgba(251, 191, 36, 0.3);
   --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Courier New', Courier, monospace;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
@@ -87,12 +88,12 @@ body {
 }
 
 /* Text Glow Effects */
-.text-glow-coral {
-  text-shadow: 0 0 20px rgba(255, 77, 77, 0.5), 0 0 40px rgba(255, 77, 77, 0.3);
+.text-glow-orange {
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.5), 0 0 40px rgba(249, 115, 22, 0.3);
 }
 
-.text-glow-cyan {
-  text-shadow: 0 0 20px rgba(0, 229, 204, 0.5), 0 0 40px rgba(0, 229, 204, 0.3);
+.text-glow-amber {
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.5), 0 0 40px rgba(251, 191, 36, 0.3);
 }
 
 .text-glow-green {
@@ -128,7 +129,7 @@ body {
   position: absolute;
   width: 12px;
   height: 12px;
-  border: 1px solid rgba(255, 77, 77, 0.3);
+  border: 1px solid rgba(249, 115, 22, 0.3);
 }
 
 .corner-brackets::before {
@@ -209,13 +210,13 @@ body {
 
 /* Selection Color */
 ::selection {
-  background: rgba(255, 77, 77, 0.3);
+  background: rgba(249, 115, 22, 0.4);
   color: #fff;
 }
 
 /* Global Focus Styles */
 :focus-visible {
-  outline: 2px solid rgba(255, 77, 77, 0.5);
+  outline: 2px solid rgba(249, 115, 22, 0.5);
   outline-offset: 2px;
 }
 
@@ -225,10 +226,10 @@ html {
 }
 
 /* Utility Classes */
-.text-coral { color: var(--accent-coral); }
-.text-cyan { color: var(--accent-cyan); }
+.text-orange { color: var(--accent-orange); }
+.text-amber { color: var(--accent-amber); }
 .text-green { color: var(--accent-green); }
-.text-red { color: var(--accent-coral); }
+.text-red { color: var(--accent-red); }
 .mono { font-family: var(--font-mono); }
 
 /* Panel Styles */
@@ -241,13 +242,11 @@ html {
 
 .panel-header {
   padding: 1rem;
-  background: var(--bg-panel);
-  border-bottom: 1px solid var(--border-color);
-  font-size: 0.9rem;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #9ca3af;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -255,24 +254,23 @@ html {
 
 /* Feed Page Specific Styles */
 .task-card {
-  background: var(--bg-panel-light);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--accent-coral);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--accent-orange);
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 12px;
   position: relative;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
 }
 
 .task-card:hover {
-  transform: translateX(2px);
-  box-shadow: var(--glow-coral);
-  border-color: var(--accent-coral);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(249, 115, 22, 0.2);
+  box-shadow: var(--glow-orange);
 }
 
 .task-card.expiring {
-  border-left-color: var(--accent-orange);
+  border-left-color: var(--accent-amber);
 }
 
 /* Animation Class for Picking Tasks */
@@ -309,7 +307,7 @@ html {
 .feed-item {
   margin-bottom: 0.75rem;
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: 8px;
   border-left: 2px solid transparent;
   background: rgba(255,255,255,0.03);
   animation: fadeIn 0.3s ease-out;
@@ -318,8 +316,8 @@ html {
 }
 
 .feed-item.payout {
-  border-left-color: var(--accent-green);
-  background: rgba(16, 185, 129, 0.05);
+  border-left-color: var(--accent-amber);
+  background: rgba(251, 191, 36, 0.05);
 }
 
 .feed-item.rejection {
@@ -328,7 +326,8 @@ html {
 }
 
 .feed-item.verification {
-  border-left-color: var(--accent-coral);
+  border-left-color: var(--accent-orange);
+  background: rgba(249, 115, 22, 0.05);
 }
 
 .feed-item.creation {
@@ -368,8 +367,8 @@ html {
 }
 
 .rank-1 { background: var(--accent-orange); color: #000; }
-.rank-2 { background: var(--text-secondary); color: #000; }
-.rank-3 { background: var(--accent-cyan); color: #000; }
+.rank-2 { background: #9ca3af; color: #000; }
+.rank-3 { background: var(--accent-amber); color: #000; }
 
 /* Pulse Animation */
 @keyframes pulse {
@@ -483,7 +482,7 @@ html {
 }
 
 .btn-wallet {
-  background: linear-gradient(45deg, #1e293b, #0f172a);
+  background: linear-gradient(45deg, #1a1a1a, #0a0a0a);
   border: 1px solid var(--accent-orange);
   color: var(--accent-orange);
   width: 100%;
@@ -493,6 +492,7 @@ html {
   gap: 10px;
   padding: 0.75rem 1rem;
   font-weight: 600;
+  border-radius: 8px;
 }
 
 .btn-wallet.connected {
@@ -528,7 +528,7 @@ html {
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: var(--accent-cyan);
+  border-color: var(--accent-orange);
 }
 
 .form-textarea {
