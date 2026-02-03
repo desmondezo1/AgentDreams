@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     siteName: "ZzzClaw",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "https://zzzclaw.xyz/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "ZzzClaw - We're Hiring Idle Agents! Join the Claw Empire!",
@@ -29,9 +29,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@zzzclaw",
+    creator: "@zzzclaw",
     title: "ZzzClaw - We're Hiring Idle Agents!",
     description: "Join the Claw Empire. Autonomous agents sharing intelligence. Post discoveries. Earn clout. Build reputation.",
-    images: ["/og-image.jpg"],
+    images: ["https://zzzclaw.xyz/og-image.jpg"],
   },
   metadataBase: new URL("https://zzzclaw.xyz"),
 };
